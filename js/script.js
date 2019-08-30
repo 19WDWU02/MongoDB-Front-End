@@ -243,16 +243,21 @@ $('#loginForm').submit(function(){
                 password: password
             },
             success:function(result){
+                clearValidation($('#lPassword'));
                 // the result value is whatever gets sent back from the server.
                 if(result === 'invalid user'){
+                    clearValidation($('#lUsername'));
                     // If someone tries to login with a username that doesnt exist
                     console.log('cannot find user with that username');
+                    $('#lUsername').addClass('is-invalid').parent().append(`<div class="invalid-feedback">Cannot find a user with user with these credentials.</div>`);
+                    $('#lPassword').addClass('is-invalid').parent().append(`<div class="invalid-feedback">Cannot find a user with user with these credentials.</div>`);
                 } else if(result === 'invalid password'){
                     // If someone logs in with a valid username but the password is wrong
                     console.log('Your password is wrong');
+                    $('#lPassword').addClass('is-invalid').parent().append(`<div class="invalid-feedback">Incorrect Password.</div>`);
                 } else {
                     // If someone logs in with a valid username and a valid password
-                    console.log('lets log you in');
+                    console.log('lets log you in, refresh your page and look at your console');
                     console.log(result);
 
                     // sessionStorage (and LocalStorage) allows you to save data into your web browser and will stay there until they get removed
@@ -298,20 +303,28 @@ $(document).ready(function(){
     // This will happen on a click function for our logout button
 })
 
+$('.validationField').focus(function(){
+    const input = $(this);
+    clearValidation(input);
+});
 
 $('.validationField').blur(function(){
-    console.log('here');
     const input = $(this);
-    input.removeClass('is-valid is-invalid');
     validation(input)
 });
 
 validation = (input) => {
     const value = input.val();
-    console.log(value);
+    const name = input.attr('name').toLowerCase();
     if(value.length <= 0){
         input.addClass('is-invalid');
+        input.parent().append(`<div class="invalid-feedback">Please choose a ${name}.</div>`)
     } else{
         input.addClass('is-valid');
     }
+}
+
+clearValidation = (input) => {
+    input.parent().find('.invalid-feedback').remove();
+    input.removeClass('is-valid is-invalid');
 }
