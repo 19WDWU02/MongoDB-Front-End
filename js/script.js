@@ -176,13 +176,18 @@ $('#registerTabBtn').click(function(){
 
 });
 
+// Register Form
 $('#registerForm').submit(function(){
     event.preventDefault();
-    // console.log('register has been clicked');
+    // Get all the values from the input fields
     const username = $('#rUsername').val();
     const email = $('#rEmail').val();
     const password = $('#rPassword').val();
     const confirmPassword = $('#rConfirmPassword').val();
+
+    // We are including basic validation
+    // Eventually we would need to include a more thorough validation (required, min, max values, emails, uniques, etc)
+    // For time sake we are just checking to see if there is a value in each input field
     if(username.length === 0){
         console.log('please enter a username');
     } else if(email.length === 0){
@@ -192,8 +197,10 @@ $('#registerForm').submit(function(){
     } else if(confirmPassword.length === 0){
         console.log('please confirm your password');
     } else if(password !== confirmPassword){
+        // We also need to check if the two passwords match
         console.log('your passwords do not match');
     } else {
+        // Once all the validation has passed we run our ajax request to our register route
         $.ajax({
             url: `${url}/users`,
             type: 'POST',
@@ -213,15 +220,21 @@ $('#registerForm').submit(function(){
     }
 });
 
+// Login Form
 $('#loginForm').submit(function(){
     event.preventDefault();
+    // Get the two input fields
     const username = $('#lUsername').val();
     const password = $('#lPassword').val();
+
+    // Add in the simple validation to make sure people input a value
     if(username.length === 0){
         console.log('please enter a username');
     } else if(password.length === 0){
         console.log('please enter a password');
     } else {
+        // Send an ajax request to our login route.
+        // Even though we are getting back a user, beacuse we are dealing with secure data (password), we want to use a POST request
         $.ajax({
             url: `${url}/getUser`,
             type: 'POST',
@@ -230,17 +243,27 @@ $('#loginForm').submit(function(){
                 password: password
             },
             success:function(result){
+                // the result value is whatever gets sent back from the server.
                 if(result === 'invalid user'){
+                    // If someone tries to login with a username that doesnt exist
                     console.log('cannot find user with that username');
                 } else if(result === 'invalid password'){
+                    // If someone logs in with a valid username but the password is wrong
                     console.log('Your password is wrong');
                 } else {
+                    // If someone logs in with a valid username and a valid password
                     console.log('lets log you in');
                     console.log(result);
 
-                    sessionStorage.setItem('userId', result['_id']);
-                    sessionStorage.setItem('userName', result['username']);
-                    sessionStorage.setItem('userEmail', result['email']);
+                    // sessionStorage (and LocalStorage) allows you to save data into your web browser and will stay there until they get removed
+                    // sessionStorage will keep data until the session is finsihed (closing the tab or browser)
+                    // localStorage will keep the data forever until someone manually clears the localStorage cache.
+                    // This is how we will be creating our login system
+                    // If we save a value into sessionStorage or localStorage, if we keep refreshing our page, the value we saved will still be there.
+                    // In our document.ready() function bellow we are checking to see if there is a value in our sessionStorage called user_Name
+                    sessionStorage.setItem('user_Id', result['_id']);
+                    sessionStorage.setItem('user_Name', result['username']);
+                    sessionStorage.setItem('user_Email', result['email']);
                 }
             },
             error:function(err){
@@ -255,11 +278,24 @@ $('#loginForm').submit(function(){
 //We are using this so that our modal appears on load
 //We will turn this off when we are ready
 $(document).ready(function(){
+    // This allows the modal to pop up on load (we will remove this line when we are done with the login / register functionality)
     $('#authForm').modal('show');
-    if(sessionStorage['userName']){
+
+    // Check to see if there is a value called user_Name in the sessionStorage, this will only be there when we login in successfully
+    if(sessionStorage['user_Name']){
+        // you have logged in
         console.log('you are logged in ');
     } else {
+        // you aren't logged in
         console.log('please sign in');
     }
+
+    // If you check sessionStorage when there isnt anything in there it should be an empty array
+    // If you check it when there is some values, it will be an object
     console.log(sessionStorage);
+
+    // From here we are going to be using a lot of if statements to hide and show specifc elements.
+    // If there is a value for user_Name, then we will see the logout button, but if there isn't then we will see the login/Register button.
+    // to clear out sessionStorage we need to call. sessionStorage.clear() which will clear all the items in our session storage.
+    // This will happen on a click function for our logout button 
 })
