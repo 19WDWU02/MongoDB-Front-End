@@ -213,9 +213,53 @@ $('#registerForm').submit(function(){
     }
 });
 
+$('#loginForm').submit(function(){
+    event.preventDefault();
+    const username = $('#lUsername').val();
+    const password = $('#lPassword').val();
+    if(username.length === 0){
+        console.log('please enter a username');
+    } else if(password.length === 0){
+        console.log('please enter a password');
+    } else {
+        $.ajax({
+            url: `${url}/getUser`,
+            type: 'POST',
+            data: {
+                username: username,
+                password: password
+            },
+            success:function(result){
+                if(result === 'invalid user'){
+                    console.log('cannot find user with that username');
+                } else if(result === 'invalid password'){
+                    console.log('Your password is wrong');
+                } else {
+                    console.log('lets log you in');
+                    console.log(result);
+
+                    sessionStorage.setItem('userId', result['_id']);
+                    sessionStorage.setItem('userName', result['username']);
+                    sessionStorage.setItem('userEmail', result['email']);
+                }
+            },
+            error:function(err){
+                console.log(err);
+                console.log('Something went wrong with logging in.');
+            }
+        })
+    }
+});
+
 
 //We are using this so that our modal appears on load
 //We will turn this off when we are ready
 $(document).ready(function(){
     $('#authForm').modal('show');
+    if(sessionStorage['userName']){
+        console.log('you are logged in ');
+    } else {
+        console.log('please sign in');
+    }
+    console.log(sessionStorage);
 })
