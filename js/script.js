@@ -278,8 +278,6 @@ $('#loginForm').submit(function(){
 //We are using this so that our modal appears on load
 //We will turn this off when we are ready
 $(document).ready(function(){
-    // This allows the modal to pop up on load (we will remove this line when we are done with the login / register functionality)
-    $('#authForm').modal('show');
 
     // Check to see if there is a value called user_Name in the sessionStorage, this will only be there when we login in successfully
     if(sessionStorage['user_Name']){
@@ -297,5 +295,23 @@ $(document).ready(function(){
     // From here we are going to be using a lot of if statements to hide and show specifc elements.
     // If there is a value for user_Name, then we will see the logout button, but if there isn't then we will see the login/Register button.
     // to clear out sessionStorage we need to call. sessionStorage.clear() which will clear all the items in our session storage.
-    // This will happen on a click function for our logout button 
+    // This will happen on a click function for our logout button
 })
+
+
+$('.validationField').blur(function(){
+    console.log('here');
+    const input = $(this);
+    input.removeClass('is-valid is-invalid');
+    validation(input)
+});
+
+validation = (input) => {
+    const value = input.val();
+    console.log(value);
+    if(value.length <= 0){
+        input.addClass('is-invalid');
+    } else{
+        input.addClass('is-valid');
+    }
+}

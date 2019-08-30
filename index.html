@@ -77,11 +77,11 @@
                 <form id="addProduct">
                     <div class="form-group">
                         <label for="productName">Product Name</label>
-                        <input type="text" name="productName" class="form-control" value="" id="productName">
+                        <input type="text" name="productName" class="form-control" id="productName">
                     </div>
                     <div class="form-group">
                         <label for="productPrice">Product Price</label>
-                        <input type="number" name="productPrice" class="form-control" value="" id="productPrice">
+                        <input type="number" name="productPrice" class="form-control" id="productPrice">
                     </div>
                     <input type="hidden" id="productID">
                     <div class="form-group">
@@ -125,21 +125,21 @@
                 </div>
                 <div class="modal-body">
                     <!-- Login Form -->
-                    <form id="loginForm" autocomplete="false">
+                    <form id="loginForm" class="" action="index.html" method="post" autocomplete="off" >
                         <div class="form-group">
                             <label for="lUsername">Username</label>
-                            <input type="text" name="lUsername" id="lUsername" class="form-control">
+                            <input type="text" name="lUsername" id="lUsername" value="" class="form-control validationField">
                         </div>
                         <div class="form-group">
                             <label for="lPassword">Password</label>
-                            <input type="password" name="lPassword" id="lPassword" class="form-control">
+                            <input type="password" name="lUsername" id="lUsername" value="" class="form-control validationField" autocomplete="new-password">
                         </div>
                         <div class="form-group">
                             <button type="submit" name="button" class="btn btn-primary btn-block">Login</button>
                         </div>
                     </form>
                     <!-- Register Form  -->
-                    <form id="registerForm" autocomplete="false" class="d-none">
+                    <form id="registerForm" autocomplete="off" class="d-none">
                         <div class="form-group">
                             <label for="rUsername">Username</label>
                             <input type="text" name="rUsername" id="rUsername" class="form-control">
@@ -150,7 +150,7 @@
                         </div>
                         <div class="form-group">
                             <label for="rPassword">Password</label>
-                            <input type="password" name="rPassword" id="rPassword" class="form-control">
+                            <input type="password" name="rPassword" id="rPassword" class="form-control" autocomplete="new-password">
                         </div>
                         <div class="form-group">
                             <label for="rConfirmPassword">Confirm Password</label>
