@@ -54,6 +54,10 @@ $('#addProductButton').click(function(){
     event.preventDefault();
     let productName = $('#productName').val();
     let productPrice = $('#productPrice').val();
+
+    //check validation here
+
+    
     if(productName.length === 0){
         console.log('please enter a products name');
     } else if(productPrice.length === 0){
@@ -283,24 +287,7 @@ $('#loginForm').submit(function(){
 //We are using this so that our modal appears on load
 //We will turn this off when we are ready
 $(document).ready(function(){
-
-    // Check to see if there is a value called user_Name in the sessionStorage, this will only be there when we login in successfully
-    // if(sessionStorage['user_Name']){
-    //     // you have logged in
-    //     console.log('you are logged in ');
-    // } else {
-    //     // you aren't logged in
-    //     console.log('please sign in');
-    // }
-
-    // If you check sessionStorage when there isnt anything in there it should be an empty array
-    // If you check it when there is some values, it will be an object
-    console.log(sessionStorage);
-
-    // From here we are going to be using a lot of if statements to hide and show specifc elements.
-    // If there is a value for user_Name, then we will see the logout button, but if there isn't then we will see the login/Register button.
-    // to clear out sessionStorage we need to call. sessionStorage.clear() which will clear all the items in our session storage.
-    // This will happen on a click function for our logout button
+    // console.log(sessionStorage);
 })
 
 $('.validationField').focus(function(){
@@ -310,8 +297,7 @@ $('.validationField').focus(function(){
 
 $('.validationField').blur(function(){
     const input = $(this);
-    const rules = $(this).data('validation');
-    let valid = validation(input, rules);
+    let valid = validation(input);
     if(valid !== true){
         input.addClass('is-invalid');
         input.parent().append(`<div class="invalid-feedback">${valid}</div>`)
@@ -320,7 +306,8 @@ $('.validationField').blur(function(){
     }
 });
 
-validation = (input, validationRules) => {
+validation = (input) => {
+    let validationRules = input.data('validation');
     const value = input.val();
     const camelName = input.attr('name');
     const splitName = camelName.replace( /([A-Z])/g, " $1" );
@@ -341,7 +328,6 @@ validation = (input, validationRules) => {
             rule = x[0];
             ruleVal = parseInt(x[1]);
         };
-        // console.log(rule);
         switch(rule){
             case 'required':
                 if(value.length === 0){
@@ -371,36 +357,6 @@ validation = (input, validationRules) => {
         }
     }
     return result;
-    // rules.map(function(rule){
-    //     if(rule.includes(':')){
-    //         const x = rule.split(':');
-    //         rule = x[0];
-    //         ruleVal = x[1];
-    //     };
-    //     switch(rule){
-    //         case 'required':
-    //             if(value.length === 0){
-    //                 result = `${name} is required. please enter a value`;
-    //             }
-    //         break;
-    //         case 'min':
-    //             if(value < ruleVal){
-    //                 result = `${name} must be at least than ${ruleVal} long`;
-    //             }
-    //         break;
-    //         case 'min':
-    //             if(value > ruleVal){
-    //                 result = `${name} must be at less than ${ruleVal} long`;
-    //             }
-    //         break;
-    //         case 'numeric':
-    //             if(!parseInt(value)){
-    //                 result = `${name} must be a number`;
-    //             }
-    //         break;
-    //     }
-    // });
-    // return result;
 }
 
 clearValidation = (input) => {
