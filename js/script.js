@@ -285,13 +285,13 @@ $('#loginForm').submit(function(){
 $(document).ready(function(){
 
     // Check to see if there is a value called user_Name in the sessionStorage, this will only be there when we login in successfully
-    if(sessionStorage['user_Name']){
-        // you have logged in
-        console.log('you are logged in ');
-    } else {
-        // you aren't logged in
-        console.log('please sign in');
-    }
+    // if(sessionStorage['user_Name']){
+    //     // you have logged in
+    //     console.log('you are logged in ');
+    // } else {
+    //     // you aren't logged in
+    //     console.log('please sign in');
+    // }
 
     // If you check sessionStorage when there isnt anything in there it should be an empty array
     // If you check it when there is some values, it will be an object
@@ -310,18 +310,97 @@ $('.validationField').focus(function(){
 
 $('.validationField').blur(function(){
     const input = $(this);
-    validation(input)
-});
-
-validation = (input) => {
-    const value = input.val();
-    const name = input.attr('name').toLowerCase();
-    if(value.length <= 0){
+    const rules = $(this).data('validation');
+    let valid = validation(input, rules);
+    if(valid !== true){
         input.addClass('is-invalid');
-        input.parent().append(`<div class="invalid-feedback">Please choose a ${name}.</div>`)
-    } else{
+        input.parent().append(`<div class="invalid-feedback">${valid}</div>`)
+    } else {
         input.addClass('is-valid');
     }
+});
+
+validation = (input, validationRules) => {
+    const value = input.val();
+    const camelName = input.attr('name');
+    const splitName = camelName.replace( /([A-Z])/g, " $1" );
+    const name = splitName.charAt(0).toUpperCase() + splitName.slice(1);
+
+    let rules;
+    if(validationRules.includes(',')){
+        rules = validationRules.split(',');
+    } else {
+        rules = [validationRules];
+    }
+
+    let result = true;
+    for (var i = 0; i < rules.length; i++) {
+        let rule = rules[i];
+        if(rule.includes(':')){
+            const x = rule.split(':');
+            rule = x[0];
+            ruleVal = parseInt(x[1]);
+        };
+        // console.log(rule);
+        switch(rule){
+            case 'required':
+                if(value.length === 0){
+                    result = `${name} is required. please enter a value`;
+                }
+            break;
+            case 'min':
+                if(value.length < ruleVal){
+                    result = `${name} must be at least than ${ruleVal} long`;
+                }
+            break;
+            case 'min':
+                if(value.length > ruleVal){
+                    result = `${name} must be at less than ${ruleVal} long`;
+                }
+            break;
+            case 'numeric':
+                if(!parseInt(value)){
+                    result = `${name} must be a number`;
+                }
+            break;
+        }
+        if(result !== true){
+            break;
+        } else {
+            continue;
+        }
+    }
+    return result;
+    // rules.map(function(rule){
+    //     if(rule.includes(':')){
+    //         const x = rule.split(':');
+    //         rule = x[0];
+    //         ruleVal = x[1];
+    //     };
+    //     switch(rule){
+    //         case 'required':
+    //             if(value.length === 0){
+    //                 result = `${name} is required. please enter a value`;
+    //             }
+    //         break;
+    //         case 'min':
+    //             if(value < ruleVal){
+    //                 result = `${name} must be at least than ${ruleVal} long`;
+    //             }
+    //         break;
+    //         case 'min':
+    //             if(value > ruleVal){
+    //                 result = `${name} must be at less than ${ruleVal} long`;
+    //             }
+    //         break;
+    //         case 'numeric':
+    //             if(!parseInt(value)){
+    //                 result = `${name} must be a number`;
+    //             }
+    //         break;
+    //     }
+    // });
+    // return result;
 }
 
 clearValidation = (input) => {
