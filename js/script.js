@@ -27,19 +27,24 @@ getProductsData = () => {
         type: 'GET',
         dataType: 'json',
         success:function(data){
+            $('#productList').empty();
             for (var i = 0; i < data.length; i++) {
-                $('#productList').append(`
+                let product = `
                     <li
                         class="list-group-item d-flex justify-content-between align-items-center productItem"
                         data-id="${data[i]._id}"
                     >
-                        <span class="productName">${data[i].name}</span>
-                        <div>
-                            <button class="btn btn-info editBtn">Edit</button>
-                            <button class="btn btn-danger removeBtn">Remove</button>
-                        </div>
-                    </li>
-                `);
+                        <span class="productName">${data[i].name}</span>`;
+                        if(sessionStorage['userName']){
+                            product += `<div>
+                                            <button class="btn btn-info editBtn">Edit</button>
+                                            <button class="btn btn-danger removeBtn">Remove</button>
+                                        </div>`;
+                        }
+                    product += `</li>
+                `;
+
+                $('#productList').append(product);
             }
         },
         error: function(err){
@@ -261,9 +266,14 @@ $('#loginForm').submit(function(){
                     // This is how we will be creating our login system
                     // If we save a value into sessionStorage or localStorage, if we keep refreshing our page, the value we saved will still be there.
                     // In our document.ready() function bellow we are checking to see if there is a value in our sessionStorage called user_Name
-                    sessionStorage.setItem('user_Id', result['_id']);
-                    sessionStorage.setItem('user_Name', result['username']);
-                    sessionStorage.setItem('user_Email', result['email']);
+                    sessionStorage.setItem('userID', result['_id']);
+                    sessionStorage.setItem('userName', result['username']);
+                    sessionStorage.setItem('userEmail', result['email']);
+                    getProductsData();
+                    $('#authForm').modal('hide');
+                    $('#loginBtn').hide();
+                    $('#logoutBtn').removeClass('d-none');
+                    $('#addProductSection').removeClass('d-none');
                 }
             },
             error:function(err){
@@ -275,16 +285,28 @@ $('#loginForm').submit(function(){
 });
 
 
+$('#logoutBtn').click(function(){
+    sessionStorage.clear();
+    getProductsData();
+    $('#loginBtn').show();
+    $('#logoutBtn').addClass('d-none');
+    $('#addProductSection').addClass('d-none');
+});
+
 //We are using this so that our modal appears on load
 //We will turn this off when we are ready
 $(document).ready(function(){
     // This allows the modal to pop up on load (we will remove this line when we are done with the login / register functionality)
-    $('#authForm').modal('show');
+    // $('#authForm').modal('show');
 
     // Check to see if there is a value called user_Name in the sessionStorage, this will only be there when we login in successfully
-    if(sessionStorage['user_Name']){
+    if(sessionStorage['userName']){
         // you have logged in
         console.log('you are logged in ');
+        $('#loginBtn').hide();
+        $('#logoutBtn').removeClass('d-none');
+        $('#addProductSection').removeClass('d-none');
+
     } else {
         // you aren't logged in
         console.log('please sign in');
@@ -297,5 +319,5 @@ $(document).ready(function(){
     // From here we are going to be using a lot of if statements to hide and show specifc elements.
     // If there is a value for user_Name, then we will see the logout button, but if there isn't then we will see the login/Register button.
     // to clear out sessionStorage we need to call. sessionStorage.clear() which will clear all the items in our session storage.
-    // This will happen on a click function for our logout button 
+    // This will happen on a click function for our logout button
 })
