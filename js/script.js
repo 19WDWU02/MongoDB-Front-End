@@ -3,6 +3,15 @@ let serverPort;
 let url;
 let editing = false;
 
+$(document).ready(function(){
+    if(sessionStorage['userName']){
+        $('#loginBtn').hide();
+        $('#logoutBtn').removeClass('d-none');
+        $('#addProductSection').removeClass('d-none');
+
+    }
+})
+
 // Get the JSON File
 $.ajax({
   url: 'config.json',
@@ -21,25 +30,39 @@ $.ajax({
 
 // Get all the products
 getProductsData = () => {
+    // run an ajax request to the route to get all the products
     $.ajax({
         // url: `${serverURL}:${serverPort}/allProducts`,
         url: `${url}/allProducts`,
         type: 'GET',
         dataType: 'json',
         success:function(data){
+            // because we run this function multiple times now, we need to empty the product list each time we call it
+            $('#productList').empty();
+            // Loop over all the items/products which get back from the database
             for (var i = 0; i < data.length; i++) {
-                $('#productList').append(`
+                // Create a variable called product which will hold our template string for our product
+                let product = `
                     <li
                         class="list-group-item d-flex justify-content-between align-items-center productItem"
                         data-id="${data[i]._id}"
                     >
-                        <span class="productName">${data[i].name}</span>
-                        <div>
-                            <button class="btn btn-info editBtn">Edit</button>
-                            <button class="btn btn-danger removeBtn">Remove</button>
-                        </div>
-                    </li>
-                `);
+                        <span class="productName">${data[i].name}</span>`;
+
+                        // We only want to see the edit and remove buttons when a user is logged in.
+                        // So we have closed the string above and written an if statement to only add on the buttons
+                        // if someone is logged on.
+                        if(sessionStorage['userName']){
+                            product += `<div>
+                                            <button class="btn btn-info editBtn">Edit</button>
+                                            <button class="btn btn-danger removeBtn">Remove</button>
+                                        </div>`;
+                        }
+                    // either way we have to close the li so we add the closing li at the end.
+                product += `</li>`;
+
+                // Once we have created our product variable with all the data/html, we append it to the productList ul
+                $('#productList').append(product);
             }
         },
         error: function(err){
@@ -52,25 +75,35 @@ getProductsData = () => {
 //Add or Edit a product
 $('#addProductButton').click(function(){
     event.preventDefault();
-    let productName = $('#productName').val();
-    let productPrice = $('#productPrice').val();
+    const productName = $('#productName');
+    const productPrice = $('#productPrice');
+    const productValid = validation(productName);
+    const priceValid = validation(productPrice);
 
-    //check validation here
+    if(productValid === true && priceValid === true){
+        productName.parent().find('.invalid-feedback').remove();
+        productName.removeClass('is-valid is-invalid');
+        productPrice.parent().find('.invalid-feedback').remove();
+        productPrice.removeClass('is-valid is-invalid');
 
+<<<<<<< HEAD
 
     if(productName.length === 0){
         console.log('please enter a products name');
     } else if(productPrice.length === 0){
         console.log('please enter a products price');
     } else {
+=======
+>>>>>>> 60c3c9b9562d3056768df01e3d7f3ccb545c85ba
         if(editing === true){
             const id = $('#productID').val();
+            console.log(id);
             $.ajax({
                 url: `${url}/product/${id}`,
                 type: 'PATCH',
                 data: {
-                    name: productName,
-                    price: productPrice
+                    name: productName.val(),
+                    price: productPrice.val()
                 },
                 success:function(result){
                     $('#productName').val(null);
@@ -96,14 +129,14 @@ $('#addProductButton').click(function(){
                 url: `${url}/product`,
                 type: 'POST',
                 data: {
-                    name: productName,
-                    price: productPrice
+                    name: productName.val(),
+                    price: productPrice.val()
                 },
                 success:function(result){
                     $('#productName').val(null);
                     $('#productPrice').val(null);
                     $('#productList').append(`
-                        <li class="list-group-item d-flex justify-content-between align-items-center productItem">
+                        <li class="list-group-item d-flex justify-content-between align-items-center productItem" data-id="${result._id}">
                             <span class="productName">${result.name}</span>
                             <div>
                                 <button class="btn btn-info editBtn">Edit</button>
@@ -118,7 +151,6 @@ $('#addProductButton').click(function(){
                 }
             })
         }
-
     }
 })
 
@@ -184,37 +216,35 @@ $('#registerTabBtn').click(function(){
 $('#registerForm').submit(function(){
     event.preventDefault();
     // Get all the values from the input fields
-    const username = $('#rUsername').val();
-    const email = $('#rEmail').val();
-    const password = $('#rPassword').val();
-    const confirmPassword = $('#rConfirmPassword').val();
+    const username = $('#rUsername');
+    const email = $('#rEmail');
+    const password = $('#rPassword');
+    const confirmPassword = $('#rConfirmPassword');
 
-    // We are including basic validation
-    // Eventually we would need to include a more thorough validation (required, min, max values, emails, uniques, etc)
-    // For time sake we are just checking to see if there is a value in each input field
-    if(username.length === 0){
-        console.log('please enter a username');
-    } else if(email.length === 0){
-        console.log('please enter an email');
-    } else if(password.length === 0){
-        console.log('please enter a password');
-    } else if(confirmPassword.length === 0){
-        console.log('please confirm your password');
-    } else if(password !== confirmPassword){
-        // We also need to check if the two passwords match
-        console.log('your passwords do not match');
-    } else {
-        // Once all the validation has passed we run our ajax request to our register route
+    const usernameValid = validation(username);
+    const emailValid = validation(email);
+    const passwordValid = validation(password);
+    const confirmPasswordValid = validation(confirmPassword);
+
+    if(usernameValid === true && emailValid === true && passwordValid === true && confirmPasswordValid === true){
         $.ajax({
             url: `${url}/users`,
             type: 'POST',
             data: {
-                username: username,
-                email: email,
-                password: password
+                username: username.val(),
+                email: email.val(),
+                password: password.val()
             },
             success:function(result){
-                console.log(result);
+                sessionStorage.setItem('userId', result['_id']);
+                sessionStorage.setItem('userName', result['username']);
+                sessionStorage.setItem('userEmail', result['email']);
+                getProductsData();
+                // Hide and show the relevant content
+                $('#authForm').modal('hide');
+                $('#loginBtn').hide();
+                $('#logoutBtn').removeClass('d-none');
+                $('#addProductSection').removeClass('d-none');
             },
             error:function(err){
                 console.log(err);
@@ -228,41 +258,31 @@ $('#registerForm').submit(function(){
 $('#loginForm').submit(function(){
     event.preventDefault();
     // Get the two input fields
-    const username = $('#lUsername').val();
-    const password = $('#lPassword').val();
+    const username = $('#lUsername');
+    const password = $('#lPassword');
 
-    // Add in the simple validation to make sure people input a value
-    if(username.length === 0){
-        console.log('please enter a username');
-    } else if(password.length === 0){
-        console.log('please enter a password');
-    } else {
-        // Send an ajax request to our login route.
-        // Even though we are getting back a user, beacuse we are dealing with secure data (password), we want to use a POST request
+    const usernameValid = validation(username);
+    const passwordValid = validation(password);
+
+    if(usernameValid === true && passwordValid === true){
         $.ajax({
             url: `${url}/getUser`,
             type: 'POST',
             data: {
-                username: username,
-                password: password
+                username: username.val(),
+                password: password.val()
             },
             success:function(result){
-                clearValidation($('#lPassword'));
                 // the result value is whatever gets sent back from the server.
                 if(result === 'invalid user'){
-                    clearValidation($('#lUsername'));
                     // If someone tries to login with a username that doesnt exist
-                    console.log('cannot find user with that username');
                     $('#lUsername').addClass('is-invalid').parent().append(`<div class="invalid-feedback">Cannot find a user with user with these credentials.</div>`);
                     $('#lPassword').addClass('is-invalid').parent().append(`<div class="invalid-feedback">Cannot find a user with user with these credentials.</div>`);
                 } else if(result === 'invalid password'){
                     // If someone logs in with a valid username but the password is wrong
-                    console.log('Your password is wrong');
                     $('#lPassword').addClass('is-invalid').parent().append(`<div class="invalid-feedback">Incorrect Password.</div>`);
                 } else {
                     // If someone logs in with a valid username and a valid password
-                    console.log('lets log you in, refresh your page and look at your console');
-                    console.log(result);
 
                     // sessionStorage (and LocalStorage) allows you to save data into your web browser and will stay there until they get removed
                     // sessionStorage will keep data until the session is finsihed (closing the tab or browser)
@@ -270,9 +290,15 @@ $('#loginForm').submit(function(){
                     // This is how we will be creating our login system
                     // If we save a value into sessionStorage or localStorage, if we keep refreshing our page, the value we saved will still be there.
                     // In our document.ready() function bellow we are checking to see if there is a value in our sessionStorage called user_Name
-                    sessionStorage.setItem('user_Id', result['_id']);
-                    sessionStorage.setItem('user_Name', result['username']);
-                    sessionStorage.setItem('user_Email', result['email']);
+                    sessionStorage.setItem('userId', result['_id']);
+                    sessionStorage.setItem('userName', result['username']);
+                    sessionStorage.setItem('userEmail', result['email']);
+                    getProductsData();
+                    // Hide and show the relevant content
+                    $('#authForm').modal('hide');
+                    $('#loginBtn').hide();
+                    $('#logoutBtn').removeClass('d-none');
+                    $('#addProductSection').removeClass('d-none');
                 }
             },
             error:function(err){
@@ -283,30 +309,25 @@ $('#loginForm').submit(function(){
     }
 });
 
-
-//We are using this so that our modal appears on load
-//We will turn this off when we are ready
-$(document).ready(function(){
-    // console.log(sessionStorage);
-})
-
-$('.validationField').focus(function(){
-    const input = $(this);
-    clearValidation(input);
+//Logout Button
+$('#logoutBtn').click(function(){
+    sessionStorage.clear();
+    getProductsData();
+    $('#loginBtn').show();
+    $('#logoutBtn').addClass('d-none');
+    $('#addProductSection').addClass('d-none');
 });
+
 
 $('.validationField').blur(function(){
     const input = $(this);
-    let valid = validation(input);
-    if(valid !== true){
-        input.addClass('is-invalid');
-        input.parent().append(`<div class="invalid-feedback">${valid}</div>`)
-    } else {
-        input.addClass('is-valid');
-    }
+    validation(input);
 });
 
 validation = (input) => {
+    input.parent().find('.invalid-feedback').remove();
+    input.removeClass('is-valid is-invalid');
+
     let validationRules = input.data('validation');
     const value = input.val();
     const camelName = input.attr('name');
@@ -373,10 +394,13 @@ validation = (input) => {
             continue;
         }
     }
-    return result;
-}
 
-clearValidation = (input) => {
-    input.parent().find('.invalid-feedback').remove();
-    input.removeClass('is-valid is-invalid');
+    if(result !== true){
+        input.addClass('is-invalid');
+        input.parent().append(`<div class="invalid-feedback">${result}</div>`)
+    } else {
+        input.addClass('is-valid');
+    }
+
+    return result;
 }
