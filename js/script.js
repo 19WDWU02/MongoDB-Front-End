@@ -145,7 +145,7 @@ $('#addProductButton').click(function(){
                     $('#productPrice').val(null);
                     // append a new product to the bottom of the productList
                     $('#productList').append(`
-                        <li class="list-group-item d-flex justify-content-between align-items-center productItem">
+                        <li class="list-group-item d-flex justify-content-between align-items-center productItem" data-id="${result._id}">
                             <span class="productName">${result.name}</span>
                             <div>
                                 <button class="btn btn-info editBtn">Edit</button>
