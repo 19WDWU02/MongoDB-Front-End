@@ -57,7 +57,7 @@ $('#addProductButton').click(function(){
 
     //check validation here
 
-    
+
     if(productName.length === 0){
         console.log('please enter a products name');
     } else if(productPrice.length === 0){
@@ -326,7 +326,7 @@ validation = (input) => {
         if(rule.includes(':')){
             const x = rule.split(':');
             rule = x[0];
-            ruleVal = parseInt(x[1]);
+            ruleVal = x[1];
         };
         switch(rule){
             case 'required':
@@ -335,18 +335,35 @@ validation = (input) => {
                 }
             break;
             case 'min':
-                if(value.length < ruleVal){
+                if(value.length < parseInt(ruleVal)){
                     result = `${name} must be at least than ${ruleVal} long`;
                 }
             break;
             case 'min':
-                if(value.length > ruleVal){
+                if(value.length > parseInt(ruleVal)){
                     result = `${name} must be at less than ${ruleVal} long`;
                 }
             break;
             case 'numeric':
                 if(!parseInt(value)){
                     result = `${name} must be a number`;
+                }
+            break;
+            case 'email':
+                // this is a regular expression for an email address
+                 const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                 if(!re.test(value)){
+                     result = `Please enter a valid email address`;
+                 }
+            break
+            case 'match':
+                if(value !== $('#'+ruleVal).val()){
+                    result = `${name} does not match ${$('#'+ruleVal).attr('name')}`;
+                    $('#'+ruleVal).parent().find('.invalid-feedback').remove();
+                    $('#'+ruleVal).addClass('is-invalid').removeClass('is-valid');
+                } else {
+                    $('#'+ruleVal).parent().find('.invalid-feedback').remove();
+                    $('#'+ruleVal).removeClass('is-invalid').addClass('is-valid');
                 }
             break;
         }
