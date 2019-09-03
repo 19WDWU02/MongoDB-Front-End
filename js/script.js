@@ -132,9 +132,7 @@ $('#addProductButton').click(function(){
                     userId: sessionStorage['userID']
                 },
                 success:function(result){
-                    console.log(result);
                     // if we successfully edit a product
-
                     // set the productName, productPrice and productID input fields to null
                     $('#productName').val(null);
                     $('#productPrice').val(null);
@@ -222,18 +220,21 @@ $('#productList').on('click', '.editBtn', function() {
         },
         dataType: 'json',
         success:function(product){
-            console.log(product);
-            // replace the input fields with the name and price from the database
-            $('#productName').val(product['name']);
-            $('#productPrice').val(product['price']);
-            // we have a hidden input field which we need to give it the value of the products id
-            $('#productID').val(product['_id']);
-            // Change the buttons text to edit and add the warning class
-            $('#addProductButton').text('Edit Product').addClass('btn-warning');
-            // Change the heading text
-            $('#heading').text('Edit Product');
-            // set the global variable of editing to true
-            editing = true;
+            if(product == '401'){
+                alert('401 UNAUTHORIZED');
+            } else {
+                // replace the input fields with the name and price from the database
+                $('#productName').val(product['name']);
+                $('#productPrice').val(product['price']);
+                // we have a hidden input field which we need to give it the value of the products id
+                $('#productID').val(product['_id']);
+                // Change the buttons text to edit and add the warning class
+                $('#addProductButton').text('Edit Product').addClass('btn-warning');
+                // Change the heading text
+                $('#heading').text('Edit Product');
+                // set the global variable of editing to true
+                editing = true;
+            }
         },
         error:function(err){
             console.log(err);
@@ -259,10 +260,17 @@ $('#productList').on('click', '.removeBtn', function(){
     $.ajax({
       url: `${url}/product/${id}`,
       type: 'DELETE',
+      data: {
+          userId: sessionStorage['userID']
+      },
       success:function(result){
-          // success will happen when we have deleted a product from the database
-          // remove the li which the button is related to
-          li.remove();
+          if(result == '401'){
+              alert('401 UNAUTHORIZED');
+          } else {
+              // success will happen when we have deleted a product from the database
+              // remove the li which the button is related to
+              li.remove();
+          }
       },
       error:function(err) {
         console.log(err);
