@@ -85,16 +85,6 @@ $('#addProductButton').click(function(){
         productName.removeClass('is-valid is-invalid');
         productPrice.parent().find('.invalid-feedback').remove();
         productPrice.removeClass('is-valid is-invalid');
-
-<<<<<<< HEAD
-
-    if(productName.length === 0){
-        console.log('please enter a products name');
-    } else if(productPrice.length === 0){
-        console.log('please enter a products price');
-    } else {
-=======
->>>>>>> 60c3c9b9562d3056768df01e3d7f3ccb545c85ba
         if(editing === true){
             const id = $('#productID').val();
             console.log(id);
