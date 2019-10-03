@@ -40,29 +40,35 @@ getProductsData = () => {
             // because we run this function multiple times now, we need to empty the product list each time we call it
             $('#productList').empty();
             // Loop over all the items/products which get back from the database
-            for (var i = 0; i < data.length; i++) {
-                // Create a variable called product which will hold our template string for our product
-                let product = `
-                    <li
-                        class="list-group-item d-flex justify-content-between align-items-center productItem"
-                        data-id="${data[i]._id}"
-                    >
-                        <span class="productName">${data[i].name}</span>`;
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    // Create a variable called product which will hold our template string for our product
+                    let product = `
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center productItem"
+                            data-id="${data[i]._id}"
+                        >
+                            <span class="productName">${data[i].name}</span>`;
 
-                        // We only want to see the edit and remove buttons when a user is logged in.
-                        // So we have closed the string above and written an if statement to only add on the buttons
-                        // if someone is logged on.
-                        if(sessionStorage['userName']){
-                            product += `<div>
-                                            <button class="btn btn-info editBtn">Edit</button>
-                                            <button class="btn btn-danger removeBtn">Remove</button>
-                                        </div>`;
-                        }
-                    // either way we have to close the li so we add the closing li at the end.
-                product += `</li>`;
+                            // We only want to see the edit and remove buttons when a user is logged in.
+                            // So we have closed the string above and written an if statement to only add on the buttons
+                            // if someone is logged on.
+                            console.log(data[i]);
+                            console.log(sessionStorage);
+                            if (data[i].user_id == sessionStorage.userId) {
+                                product += `<div>
+                                                <button class="btn btn-info editBtn">Edit</button>
+                                                <button class="btn btn-danger removeBtn">Remove</button>
+                                            </div>`;
+                            }
+                        // either way we have to close the li so we add the closing li at the end.
+                    product += `</li>`;
 
-                // Once we have created our product variable with all the data/html, we append it to the productList ul
-                $('#productList').append(product);
+                    // Once we have created our product variable with all the data/html, we append it to the productList ul
+                    $('#productList').append(product);
+                }
+            } else {
+                $('#productList').html('<p>No products found</p>');
             }
         },
         error: function(err){
@@ -120,11 +126,15 @@ $('#addProductButton').click(function(){
                 type: 'POST',
                 data: {
                     name: productName.val(),
-                    price: productPrice.val()
+                    price: productPrice.val(),
+                    userId: sessionStorage.userId
                 },
                 success:function(result){
                     $('#productName').val(null);
                     $('#productPrice').val(null);
+                    if ($('#productList').html() == '<p>No products found</p>') {
+                        $('#productList').html(null);
+                    }
                     $('#productList').append(`
                         <li class="list-group-item d-flex justify-content-between align-items-center productItem" data-id="${result._id}">
                             <span class="productName">${result.name}</span>
